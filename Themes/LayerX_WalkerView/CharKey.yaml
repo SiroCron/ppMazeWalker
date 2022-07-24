@@ -1,0 +1,9 @@
+name: "CharKey"
+
+images:
+  - {name: "img", file: "CharKey.png", width: 7, height: 7}
+
+animations:
+  - {name: "anim", img_name: "img", pattern: "0<"}
+
+states: ["anim"]

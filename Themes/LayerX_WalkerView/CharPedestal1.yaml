@@ -1,0 +1,9 @@
+name: "CharPedestal1"
+
+images:
+  - {name: "img", file: "CharPedestal1.png", width: 7, height: 7}
+
+animations:
+  - {name: "anim", img_name: "img", pattern: "0<"}
+
+states: ["anim"]

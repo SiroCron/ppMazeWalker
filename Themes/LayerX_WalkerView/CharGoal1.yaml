@@ -1,0 +1,9 @@
+name: "CharGoal1"
+
+images:
+  - {name: "img", file: "CharGoal1.png", width: 7, height: 7}
+
+animations:
+  - {name: "anim", img_name: "img", pattern: "0<"}
+
+states: ["anim"]

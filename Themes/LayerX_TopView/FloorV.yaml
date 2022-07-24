@@ -1,0 +1,9 @@
+name: "FloorV"
+
+images:
+  - {name: "img", file: "FloorV.png", width: 8, height: 16}
+
+animations:
+  - {name: "anim", img_name: "img"}
+
+states: ["anim"]

@@ -1,0 +1,10 @@
+name: "WallH"
+
+images:
+  - {name: "img", file: "WallH.png", width: 16, height: 8}
+
+animations:
+  - {name: "none", img_name: "img"}
+  - {name: "exist", img_name: "img", interval: 200, pattern: "*12_*13_*14_*123_*124_*132_*134_*142_*143_"}
+
+states: ["none", "exist"]

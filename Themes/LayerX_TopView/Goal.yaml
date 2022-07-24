@@ -1,0 +1,11 @@
+name: "Goal"
+
+images:
+  - {name: "Img0", file: "Goal0.png", width: 16, height: 16}
+  - {name: "Img1", file: "Goal1.png", width: 16, height: 16}
+
+animations:
+  - {name: "Anim0", img_name: "Img0", interval: 100, pattern: "0123456<"}
+  - {name: "Anim1", img_name: "Img1"}
+
+states: ["Anim0", "Anim1"]

@@ -1,0 +1,12 @@
+# 対応しているルール
+rules:
+  # name: ルールの名称
+  # version: 配列要素1つ以上で定義すること
+  #          ルールのバージョンと全て一致している場合に、利用可能テーマと判断する
+  #
+  # - {name: "Layer0", version: [1]} # majorリリース '1' であれば利用可能
+  # - {name: "Layer1", version: [1,0]} # 1.0.x系で利用可能
+  # - {name: "Layer1", version: [1,1]} # 1.1.x系で利用可能, 同一ルールで複数対応する場合はそれぞれ書く
+  #
+  - {name: "Layer0", version: [1,0]}
+  - {name: "Layer1", version: [1,0]}

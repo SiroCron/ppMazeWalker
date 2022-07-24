@@ -1,0 +1,9 @@
+name: "CharOrb"
+
+images:
+  - {name: "img", file: "CharOrb.png", width: 7, height: 7}
+
+animations:
+  - {name: "anim", img_name: "img", pattern: "0<"}
+
+states: ["anim"]

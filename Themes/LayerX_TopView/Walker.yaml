@@ -1,0 +1,44 @@
+# ObjectをCreateするときにKeyとなる名前
+name: "Walker"
+
+# 画像の定義
+#   name: 画像の名称(次のanimationsで使用)
+#   file: 画像ファイル,テーマフォルダからの相対パスで指定する
+#   width, height: 1コマのサイズ,余り無く割り切れること,左上から右方向にコマ0-コマ1と割り当てられる,最大16コマ分まで対応,無指定時はフルサイズ1コマとなる
+images:
+  - {name: "Img0", file: "Walker0.png", width: 16, height: 16}
+  - {name: "Img1", file: "Walker1.png", width: 16, height: 16}
+  - {name: "Img2", file: "Walker2.png", width: 16, height: 16}
+  - {name: "Img3", file: "Walker3.png", width: 16, height: 16}
+
+# アニメーションの定義
+#   name: アニメーションの名称(次のstatesで使用)
+#   img_name: 使用する画像
+#   interval: アニメーションのコマ切替間隔(msec),無指定時はアニメ無し0コマ目のみ,切替間隔はアニメーション内共通
+#   pattern: アニメーションのコマ表示順序,16進数で指定する,無指定時は"0"となる
+#             "<"...最初に戻る
+#             "*"...ジャンプ先
+#             "_"...いずれかの"*"にランダムジャンプ
+animations:
+  - {name: "Anim0", img_name: "Img0", interval: 600, pattern: "01<"}
+  - {name: "Anim1", img_name: "Img1", interval: 600, pattern: "01<"}
+  - {name: "Anim2", img_name: "Img2", interval: 600, pattern: "01<"}
+  - {name: "Anim3", img_name: "Img3", interval: 600, pattern: "01<"}
+
+# 各状態にアニメーションを割り当てる
+#
+# 向き:0~3
+states: ["Anim0", "Anim1", "Anim2", "Anim3"]
+
+# 詳細設定(スプライト内共通)
+#   記述しなくてもいい,無指定時は以下の設定となる
+#
+# detail:
+#   # Texture
+#   pivot: {x: 0.5, y: 0.5}
+#   pixels_per_unit: 1.0
+
+#   # Sprite
+#   flip_x: false
+#   flip_y: false
+#   scale: {x: 1.0, y: 1.0, z: 1.0}

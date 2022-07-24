@@ -1,0 +1,9 @@
+name: "CharFloor"
+
+images:
+  - {name: "img", file: "CharFloor.png", width: 7, height: 7}
+
+animations:
+  - {name: "anim", img_name: "img", pattern: "0<"}
+
+states: ["anim"]

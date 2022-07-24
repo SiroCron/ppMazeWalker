@@ -1,0 +1,9 @@
+name: "Item_Orb"
+
+images:
+  - {name: "img", file: "Item_Orb.png", width: 16, height: 16}
+
+animations:
+  - {name: "anim", img_name: "img"}
+
+states: ["anim"]

@@ -1,0 +1,10 @@
+rulename: Layer0
+themename: LayerX_TopView
+stage:
+  name: Stage00
+  is_random_seed: true
+walkername: MyWalker
+option:
+  sound:
+    volume_BGM: 100
+    volume_SE: 100

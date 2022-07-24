@@ -1,0 +1,9 @@
+name: "Item_Gun"
+
+images:
+  - {name: "img", file: "Item_Gun.png", width: 16, height: 16}
+
+animations:
+  - {name: "anim", img_name: "img"}
+
+states: ["anim"]

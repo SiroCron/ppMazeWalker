@@ -1,0 +1,11 @@
+name: "Pedestal"
+
+images:
+  - {name: "Img0", file: "Pedestal0.png", width: 16, height: 16}
+  - {name: "Img1", file: "Pedestal1.png", width: 16, height: 16}
+
+animations:
+  - {name: "Anim0", img_name: "Img0"}
+  - {name: "Anim1", img_name: "Img1"}
+
+states: ["Anim0", "Anim1"]

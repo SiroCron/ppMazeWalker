@@ -1,0 +1,9 @@
+name: "Prowler_Enemy"
+
+images:
+  - {name: "Img", file: "Prowler_Enemy.png", width: 16, height: 16}
+
+animations:
+  - {name: "Anim", img_name: "Img", interval: 80, pattern: "*00000000_*000000_*0000_*00_*00100_*0010100_*00011000_*12345654321_"}
+
+states: ["Anim"]
