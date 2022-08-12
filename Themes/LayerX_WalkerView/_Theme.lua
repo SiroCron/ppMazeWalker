@@ -40,8 +40,8 @@ local C_TransparencyValue = 0.3
 theme.Init = function()
     local ret = cs.assist:CreateIsSuccess()
 
-    ret.b = theme.InitCamera()
-    ret.b = theme.InitSprite()
+    ret.b = theme._InitCamera()
+    ret.b = theme._InitSprite()
     ret.b = LTC.InitSE()
     ret.b = LTC.InitBGM()
 
@@ -76,7 +76,7 @@ end
 -- ///
 -- //
 -- /
---      ルールからCallされる関数(必須)
+--      ルールからCallされるイベント(任意)
 --                                                                            /
 --                                                                           //
 --                                                                          ///
@@ -88,29 +88,31 @@ end
 -- _si : 処理情報
 --      _si.count : フェーズ移行後何度目の呼び出しか(0スタート)
 --      _si.delta_time : 更新間隔(sec,float)
+-- _st : 開始パラメータテーブル
+-- _rp : リピートパラメータテーブル(初回はnil)
 --
 -- 戻り値 : true .... 正常終了
 --          false ... 異常終了
 --
-theme.QuestStart = function(_si)
-    local f = {
-        function()
-            cs.se:StopAll()
+theme.QuestStart = function(_si, _st, _rp)
+    cs.se:StopAll()
 
-            return true
-        end,
-    }
-
-    return f[_si.count + 1]()
+    return true
 end
 
 -- ============================================================================
 -- Walker行動直前の処理
 --
+-- _si : 処理情報
+--      _si.count : フェーズ移行後何度目の呼び出しか(0スタート)
+--      _si.delta_time : 更新間隔(sec,float)
+-- _st : 開始パラメータテーブル
+-- _rp : リピートパラメータテーブル(初回はnil)
+--
 -- 戻り値 : true .... 正常終了
 --          false ... 異常終了
 --
-theme.RoundSetup = function(_si)
+theme.RoundSetup = function(_si, _st, _rp)
     -- 前回のビューオブジェクト解放 -----------------------
 
     cs.sprite:DestroyObjectGroup()
@@ -130,10 +132,10 @@ theme.RoundSetup = function(_si)
     cs.camera:ResetRotation()
 
     -- maze -------------------------------------
-    theme.Maze_BuildMap(map)
+    theme._Maze_BuildMap(map)
 
     -- walker -----------------------------------
-    theme.Maze_GenWalker()
+    theme._Maze_GenWalker()
 
     return true
 end
@@ -141,64 +143,176 @@ end
 -- ============================================================================
 -- Walker前進
 --
+-- _si : 処理情報
+--      _si.count : フェーズ移行後何度目の呼び出しか(0スタート)
+--      _si.delta_time : 更新間隔(sec,float)
+-- _st : 開始パラメータテーブル
+-- _rp : リピートパラメータテーブル(初回はnil)
+--
 -- 戻り値 : true .... 正常終了
 --          false ... 異常終了
 --
-theme.Walker_MoveForward = function(_si)
-    if _si.count == 0 then
+theme.ActionMoveForward = function(_si, _st, _rp)
+    if event.is_first_call then
         local sprite_obj = cs.sprite:GetObject("Walker")
         local dy = C_MapchipSize * 2
-        SimpleAnim.MoveSpriteStart("MoveWalker", sprite_obj, true, 0.0, dy, 0.0, 0.5)
+        SimpleAnim.MoveSpriteStart("WalkerAction", sprite_obj, true, 0.0, dy, 0.0, 0.5)
     end
 
-    if SimpleAnim.Exec("MoveWalker", _si) then
-        return true, "continue"
-    else
-        return true, nil
+    if SimpleAnim.Exec("WalkerAction", _si) then -- 終わってないなら繰り返す
+        event:SetRepeat(nil)
     end
+
+    return true
+end
+
+-- ============================================================================
+-- Walker後退
+--
+-- _si : 処理情報
+--      _si.count : フェーズ移行後何度目の呼び出しか(0スタート)
+--      _si.delta_time : 更新間隔(sec,float)
+-- _st : 開始パラメータテーブル
+-- _rp : リピートパラメータテーブル(初回はnil)
+--
+-- 戻り値 : true .... 正常終了
+--          false ... 異常終了
+--
+theme.ActionMoveBackward = function(_si, _st, _rp)
+    if event.is_first_call then
+        local sprite_obj = cs.sprite:GetObject("Walker")
+        local dy = C_MapchipSize * -2
+        SimpleAnim.MoveSpriteStart("WalkerAction", sprite_obj, true, 0.0, dy, 0.0, 0.5)
+    end
+
+    if SimpleAnim.Exec("WalkerAction", _si) then -- 終わってないなら繰り返す
+        event:SetRepeat(nil)
+    end
+
+    return true
+end
+
+-- ============================================================================
+-- Walker左移動
+--
+-- _si : 処理情報
+--      _si.count : フェーズ移行後何度目の呼び出しか(0スタート)
+--      _si.delta_time : 更新間隔(sec,float)
+-- _st : 開始パラメータテーブル
+-- _rp : リピートパラメータテーブル(初回はnil)
+--
+-- 戻り値 : true .... 正常終了
+--          false ... 異常終了
+--
+theme.ActionMoveLeft = function(_si, _st, _rp)
+    if event.is_first_call then
+        local sprite_obj = cs.sprite:GetObject("Walker")
+        local dx = C_MapchipSize * -2
+        SimpleAnim.MoveSpriteStart("WalkerAction", sprite_obj, true, dx, 0.0, 0.0, 0.5)
+    end
+
+    if SimpleAnim.Exec("WalkerAction", _si) then -- 終わってないなら繰り返す
+        event:SetRepeat(nil)
+    end
+
+    return true
+end
+
+-- ============================================================================
+-- Walker右移動
+--
+-- _si : 処理情報
+--      _si.count : フェーズ移行後何度目の呼び出しか(0スタート)
+--      _si.delta_time : 更新間隔(sec,float)
+-- _st : 開始パラメータテーブル
+-- _rp : リピートパラメータテーブル(初回はnil)
+--
+-- 戻り値 : true .... 正常終了
+--          false ... 異常終了
+--
+theme.ActionMoveRight = function(_si, _st, _rp)
+    if event.is_first_call then
+        local sprite_obj = cs.sprite:GetObject("Walker")
+        local dx = C_MapchipSize * 2
+        SimpleAnim.MoveSpriteStart("WalkerAction", sprite_obj, true, dx, 0.0, 0.0, 0.5)
+    end
+
+    if SimpleAnim.Exec("WalkerAction", _si) then -- 終わってないなら繰り返す
+        event:SetRepeat(nil)
+    end
+
+    return true
 end
 
 -- ============================================================================
 -- Walker回転
 --
+-- _si : 処理情報
+--      _si.count : フェーズ移行後何度目の呼び出しか(0スタート)
+--      _si.delta_time : 更新間隔(sec,float)
+-- _st : 開始パラメータテーブル
+-- _rp : リピートパラメータテーブル(初回はnil)
+--
 -- 戻り値 : true .... 正常終了
 --          false ... 異常終了
 --
-theme.Walker_TurnLeft = function(_si)
-    if _si.count == 0 then
+theme.ActionTurnLeft = function(_si, _st, _rp)
+    if event.is_first_call then
         local sprite_obj = cs.sprite:GetObject("Walker")
-        SimpleAnim.RotateSpriteStart("RotateWalker", sprite_obj, true, 0.0, 0.0, 90.0, 0.5)
+        SimpleAnim.RotateSpriteStart("WalkerAction", sprite_obj, true, 0.0, 0.0, 90.0, 0.5)
     end
 
-    if SimpleAnim.Exec("RotateWalker", _si) then
-        return true, "continue"
-    else
-        return true, nil
+    if SimpleAnim.Exec("WalkerAction", _si) then -- 終わってないなら繰り返す
+        event:SetRepeat(nil)
     end
+
+    return true
 end
 
-theme.Walker_TurnRight = function(_si)
-    if _si.count == 0 then
+theme.ActionTurnRight = function(_si, _st, _rp)
+    if event.is_first_call then
         local sprite_obj = cs.sprite:GetObject("Walker")
-        SimpleAnim.RotateSpriteStart("RotateWalker", sprite_obj, true, 0.0, 0.0, -90.0, 0.5)
+        SimpleAnim.RotateSpriteStart("WalkerAction", sprite_obj, true, 0.0, 0.0, -90.0, 0.5)
     end
 
-    if SimpleAnim.Exec("RotateWalker", _si) then
-        return true, "continue"
-    else
-        return true, nil
+    if SimpleAnim.Exec("WalkerAction", _si) then -- 終わってないなら繰り返す
+        event:SetRepeat(nil)
     end
+
+    return true
+end
+
+-- ============================================================================
+-- 待機
+--
+-- _si : 処理情報
+--      _si.count : フェーズ移行後何度目の呼び出しか(0スタート)
+--      _si.delta_time : 更新間隔(sec,float)
+-- _st : 開始パラメータテーブル
+-- _rp : リピートパラメータテーブル(初回はnil)
+--
+-- 戻り値 : true .... 正常終了
+--          false ... 異常終了
+--
+theme.ActionWait = function(_si, _st, _rp)
+    return true
 end
 
 -- ============================================================================
 -- アイテム取得
 --
+-- _si : 処理情報
+--      _si.count : フェーズ移行後何度目の呼び出しか(0スタート)
+--      _si.delta_time : 更新間隔(sec,float)
+-- _st : 開始パラメータテーブル
+-- _rp : リピートパラメータテーブル(初回はnil)
+--
 -- 戻り値 : true .... 正常終了
 --          false ... 異常終了
 --
-theme.Walker_Pickup = function(_si)
+theme.ActionPickup = function(_si, _st, _rp)
     -- SE
-    if _si.count == 0 then cs.se:Get(LTC.SE_Pickup):Play() end
+    cs.se:Get(LTC.SE_Pickup):Play()
 
     return true
 end
@@ -206,22 +320,34 @@ end
 -- ============================================================================
 -- アイテム使用 - 鍵
 --
+-- _si : 処理情報
+--      _si.count : フェーズ移行後何度目の呼び出しか(0スタート)
+--      _si.delta_time : 更新間隔(sec,float)
+-- _st : 開始パラメータテーブル
+-- _rp : リピートパラメータテーブル(初回はnil)
+--
 -- 戻り値 : true .... 正常終了
 --          false ... 異常終了
 --
-theme.Walker_UseItem_Key = function(_si)
+theme.ActionUseItem_Key = function(_si, _st, _rp)
     return true
 end
 
 -- ============================================================================
 -- アイテム使用 - 宝玉
 --
+-- _si : 処理情報
+--      _si.count : フェーズ移行後何度目の呼び出しか(0スタート)
+--      _si.delta_time : 更新間隔(sec,float)
+-- _st : 開始パラメータテーブル
+-- _rp : リピートパラメータテーブル(初回はnil)
+--
 -- 戻り値 : true .... 正常終了
 --          false ... 異常終了
 --
-theme.Walker_UseItem_Orb = function(_si)
+theme.ActionUseItem_Orb = function(_si, _st, _rp)
     -- SE
-    if _si.count == 0 then cs.se:Get(LTC.SE_UseItem):Play() end
+    cs.se:Get(LTC.SE_UseItem):Play()
 
     return true
 end
@@ -229,55 +355,103 @@ end
 -- ============================================================================
 -- アイテム使用 - 銃
 --
+-- _si : 処理情報
+--      _si.count : フェーズ移行後何度目の呼び出しか(0スタート)
+--      _si.delta_time : 更新間隔(sec,float)
+-- _st : 開始パラメータテーブル
+-- _rp : リピートパラメータテーブル(初回はnil)
+--
 -- 戻り値 : true .... 正常終了
 --          false ... 異常終了
 --
-theme.Walker_UseItem_Gun = function(_si, _r)
+theme.ActionUseItem_Gun = function(_si, _st, _rp)
     -- SE
-    if _si.count == 0 then cs.se:Get(LTC.SE_UseItem_Gun):Play() end
+    cs.se:Get(LTC.SE_UseItem_Gun):Play()
 
-    -- 敵に当たってない？
-    if tonumber(_r.mapchar) == nil then return true end
+    return true
+end
 
-    -- アニメーション ---------------------------
-
-    local lloc = theme.ConvertToLocalLoc(_r)
-    local sprite_name = theme.GenerateObjectName("Prowler", lloc.x + 1, lloc.y + 1)
-
-    if _si.count == 0 then
-        SimpleAnim.RotateSpriteStart("Prowler", cs.sprite:GetObject(sprite_name), false, 90.0, 0.0, 0.0, 0.5)
-    end
-
-    if SimpleAnim.Exec("Prowler", _si) then
-        return true, "continue"
-    else
-        cs.sprite:DestroyObject(sprite_name)
-        return true, nil
-    end
+-- ============================================================================
+-- ラウンド移行
+--
+-- _si : 処理情報
+--      _si.count : フェーズ移行後何度目の呼び出しか(0スタート)
+--      _si.delta_time : 更新間隔(sec,float)
+-- _st : 開始パラメータテーブル
+-- _rp : リピートパラメータテーブル(初回はnil)
+--
+-- 戻り値 : true .... 正常終了
+--          false ... 異常終了
+--
+theme.RoundNext = function(_si, _st, _rp)
+    return true
 end
 
 -- ============================================================================
 -- クエストの中断/成功/失敗
 --
+-- _si : 処理情報
+--      _si.count : フェーズ移行後何度目の呼び出しか(0スタート)
+--      _si.delta_time : 更新間隔(sec,float)
+-- _st : 開始パラメータテーブル
+-- _rp : リピートパラメータテーブル(初回はnil)
+--
 -- 戻り値 : true .... 正常終了
 --          false ... 異常終了
 --
-theme.QuestStop = function(_si)
+theme.QuestStop = function(_si, _st, _rp)
     cs.se:StopAll()
     return true
 end
 
-theme.QuestClear = function(_si)
+theme.QuestClear = function(_si, _st, _rp)
     cs.se:StopAll()
     cs.se:Get(LTC.SE_QuestClear):Play()
     return true
 end
 
-theme.QuestFailure = function(_si)
+theme.QuestFailure = function(_si, _st, _rp)
     cs.se:StopAll()
     cs.se:Get(LTC.SE_QuestFailure):Play()
     return true
 end
+
+-- ============================================================================
+-- Prowler
+--
+-- _si : 処理情報
+--      _si.count : フェーズ移行後何度目の呼び出しか(0スタート)
+--      _si.delta_time : 更新間隔(sec,float)
+-- _st : 開始パラメータテーブル
+-- _rp : リピートパラメータテーブル(初回はnil)
+--
+-- 戻り値 : true .... 正常終了
+--          false ... 異常終了
+--
+-- theme.ProwlerBorn = function(_si, _st, _rp)
+-- end
+--
+-- theme.ProwlerMove = function(_si, _st, _rp)
+--     return true
+-- end
+
+theme.ProwlerDestroy = function(_si, _st, _rp)
+    local sprite_name = theme._GenerateObjectName("Prowler", _st.x, _st.y)
+
+    if event.is_first_call then
+        -- アニメーション
+        SimpleAnim.RotateSpriteStart(event.section_name, cs.sprite:GetObject(sprite_name), false, 90.0, 0.0, 0.0, 0.5)
+    end
+
+    if SimpleAnim.Exec(event.section_name, _si) then -- 終わってないなら繰り返す
+        event:SetRepeat(nil)
+    else
+        cs.sprite:DestroyObject(sprite_name)
+    end
+
+    return true
+end
+
 
 -- ////////////////////////////////////////////////////////////////////////////
 -- ///
@@ -289,7 +463,7 @@ end
 --                                                                          ///
 -- ////////////////////////////////////////////////////////////////////////////
 
-theme.InitCamera = function()
+theme._InitCamera = function()
     cs.camera:SetBackgroundColor(0.1, 0.1, 0.2, 1.0)
     cs.camera:SetOrthographic()
     cs.camera:SetPosition(0, 0, C_CameraZ)
@@ -298,13 +472,13 @@ theme.InitCamera = function()
     return true
 end
 
-theme.InitSprite = function()
+theme._InitSprite = function()
     local ret = cs.assist:CreateIsSuccess()
 
     local mapchip_sprites = {
         "Floor", "FloorC", "FloorH", "FloorV",
         "Goal",
-        "Item_Key", "Item_Orb",
+        "Item_Key", "Item_Orb", "Item_Gun",
         "Pedestal",
         "Prowler_Enemy",
         "Walker",
@@ -333,23 +507,26 @@ end
 
 -- maze -------------------------------------------------------------
 
-theme.Maze_BuildMap = function(_map)
-    local cx, cy = theme.Maze_GetMapCenter(_map)
+theme._Maze_BuildMap = function(_map)
+    local cx, cy = theme._Maze_GetMapCenter(_map)
 
     for yi = 0, _map.height - 1 do
         for xi = 0, _map.width - 1 do
-            local x, y = xi - cx, yi - cy
+            local coord_wmap = { x = xi - cx, y = cy - yi }
+            local coord_mmap = theme._ConvCoord_Walkermap2Mazemap(coord_wmap)
+
             local char = _map:Get(xi, yi)
-            if x == 0 and y == 0 then
+            if xi == cx and yi == cy then
                 char = cs.walker.current_mapchip
             end
 
-            local objs = theme.Maze_CreateMapchip(x + 1, y + 1, char)
+            local objs = theme._Maze_CreateMapchip(coord_mmap.x, coord_mmap.y, char)
             if objs == nil then
                 return false
             else
                 for i, v in ipairs(objs) do
-                    v:SetPosition(x * C_MapchipSize, -y * C_MapchipSize, C_MapchipStartZ + (i * C_MapchipOffsetZ))
+                    v:SetPosition(coord_wmap.x * C_MapchipSize, coord_wmap.y * C_MapchipSize,
+                        C_MapchipStartZ + (i * C_MapchipOffsetZ))
                     v:Show()
                 end
             end
@@ -359,7 +536,7 @@ theme.Maze_BuildMap = function(_map)
     return true
 end
 
-theme.Maze_GetMapCenter = function(_map)
+theme._Maze_GetMapCenter = function(_map)
     for yi = 0, _map.height - 1 do
         for xi = 0, _map.width - 1 do
             if _map:Get(xi, yi) == "@" then return xi, yi end
@@ -369,22 +546,22 @@ theme.Maze_GetMapCenter = function(_map)
     return 0, 0
 end
 
-theme.Maze_CreateMapchip = function(_xi, _yi, _char)
-    local objs = theme.Maze_CreateMapchip_Floor(_xi, _yi)
+theme._Maze_CreateMapchip = function(_xi, _yi, _char)
+    local objs = theme._Maze_CreateMapchip_Floor(_xi, _yi)
     if objs == nil then return nil end
 
     local obj = nil
 
     if _char == "#" then
-        obj = theme.Maze_CreateMapchip_Wall(_xi, _yi)
+        obj = theme._Maze_CreateMapchip_Wall(_xi, _yi)
     elseif _char == "D" or _char == "$" then
-        obj = theme.Maze_CreateMapchip_Goal(_xi, _yi, _char)
+        obj = theme._Maze_CreateMapchip_Goal(_xi, _yi, _char)
     elseif _char == "l" or _char == "i" then
-        obj = theme.Maze_CreateMapchip_Pedestal(_xi, _yi, _char)
+        obj = theme._Maze_CreateMapchip_Pedestal(_xi, _yi, _char)
     elseif _char == "k" or _char == "o" then
-        obj = theme.Maze_CreateMapchip_Item(_xi, _yi, _char)
+        obj = theme._Maze_CreateMapchip_Item(_xi, _yi, _char)
     else -- 最後
-        obj = theme.Maze_CreateMapchip_Prowler(_xi, _yi, _char)
+        obj = theme._Maze_CreateMapchip_Prowler(_xi, _yi, _char)
     end
 
     if obj ~= nil then table.insert(objs, obj) end
@@ -392,7 +569,7 @@ theme.Maze_CreateMapchip = function(_xi, _yi, _char)
     -- CharSprites ------------------------------
 
     obj = nil
-    local cname = theme.GenerateObjectName("Char", _xi, _yi)
+    local cname = theme._GenerateObjectName("Char", _xi, _yi)
 
     if _char == "!" then
         obj = cs.sprite:CreateObject(cname, "CharExclamation")
@@ -417,10 +594,11 @@ theme.Maze_CreateMapchip = function(_xi, _yi, _char)
     elseif _char == "#" then
         obj = cs.sprite:CreateObject(cname, "CharWall")
     else -- 最後
-        local no = tonumber(_char)
-        if no ~= nil then
+        if cs.maze:IsProwler(_char) then
             obj = cs.sprite:CreateObject(cname, "CharProwler")
-            if obj ~= nil then obj:SetState(no) end
+            if obj ~= nil then
+                obj:SetState(tonumber(_char)) -- このルールでは敵=数字で固定している
+            end
         end
     end
 
@@ -429,17 +607,17 @@ theme.Maze_CreateMapchip = function(_xi, _yi, _char)
     return objs
 end
 
-theme.Maze_CreateMapchip_Floor = function(_xi, _yi)
+theme._Maze_CreateMapchip_Floor = function(_xi, _yi)
     local key = ((_xi % 2) == 0 and "I" or "O") .. ((_yi % 2) == 0 and "I" or "O")
     local floors = {
         II = "FloorC",
-        IO = "FloorV",
-        OI = "FloorH",
+        IO = (cs.walker.d % 2 == 0) and "FloorV" or "FloorH",
+        OI = (cs.walker.d % 2 == 0) and "FloorH" or "FloorV",
         OO = "Floor"
     }
 
     -- Floor
-    local obj = cs.sprite:CreateObject(theme.GenerateObjectName("Floor", _xi, _yi), floors[key])
+    local obj = cs.sprite:CreateObject(theme._GenerateObjectName("Floor", _xi, _yi), floors[key])
     if obj == nil then return nil end
 
     obj:SetTransparency(C_TransparencyValue)
@@ -447,12 +625,12 @@ theme.Maze_CreateMapchip_Floor = function(_xi, _yi)
     return { obj }
 end
 
-theme.Maze_CreateMapchip_Wall = function(_xi, _yi)
+theme._Maze_CreateMapchip_Wall = function(_xi, _yi)
     local key = ((_xi % 2) == 0 and "I" or "O") .. ((_yi % 2) == 0 and "I" or "O")
     local walls = {
         II = "WallC",
-        IO = "WallV",
-        OI = "WallH",
+        IO = (cs.walker.d % 2 == 0) and "WallV" or "WallH",
+        OI = (cs.walker.d % 2 == 0) and "WallH" or "WallV",
         OO = nil
     }
 
@@ -460,7 +638,7 @@ theme.Maze_CreateMapchip_Wall = function(_xi, _yi)
     if wall_name == nil then return nil end
 
     -- Wall
-    local obj = cs.sprite:CreateObject(theme.GenerateObjectName("Wall", _xi, _yi), wall_name)
+    local obj = cs.sprite:CreateObject(theme._GenerateObjectName("Wall", _xi, _yi), wall_name)
     if obj == nil then return nil end
 
     if wall_name ~= "WallC" then
@@ -472,8 +650,8 @@ theme.Maze_CreateMapchip_Wall = function(_xi, _yi)
     return obj
 end
 
-theme.Maze_CreateMapchip_Goal = function(_xi, _yi, _char)
-    local obj = cs.sprite:CreateObject(theme.GenerateObjectName("Goal", _xi, _yi), "Goal")
+theme._Maze_CreateMapchip_Goal = function(_xi, _yi, _char)
+    local obj = cs.sprite:CreateObject(theme._GenerateObjectName("Goal", _xi, _yi), "Goal")
     if obj == nil then return nil end
 
     if _char == "D" then obj:SetState(0)
@@ -484,8 +662,8 @@ theme.Maze_CreateMapchip_Goal = function(_xi, _yi, _char)
     return obj
 end
 
-theme.Maze_CreateMapchip_Pedestal = function(_xi, _yi, _char)
-    local obj = cs.sprite:CreateObject(theme.GenerateObjectName("Pedestal", _xi, _yi), "Pedestal")
+theme._Maze_CreateMapchip_Pedestal = function(_xi, _yi, _char)
+    local obj = cs.sprite:CreateObject(theme._GenerateObjectName("Pedestal", _xi, _yi), "Pedestal")
     if obj == nil then return nil end
 
     if _char == "l" then obj:SetState(0)
@@ -496,13 +674,14 @@ theme.Maze_CreateMapchip_Pedestal = function(_xi, _yi, _char)
     return obj
 end
 
-theme.Maze_CreateMapchip_Item = function(_xi, _yi, _char)
+theme._Maze_CreateMapchip_Item = function(_xi, _yi, _char)
     local items = {
         k = "Item_Key",
-        o = "Item_Orb"
+        o = "Item_Orb",
+        g = "Item_Gun",
     }
 
-    local obj = cs.sprite:CreateObject(theme.GenerateObjectName("Item", _xi, _yi), items[_char])
+    local obj = cs.sprite:CreateObject(theme._GenerateObjectName("Item", _xi, _yi), items[_char])
     if obj == nil then return nil end
 
     obj:SetTransparency(C_TransparencyValue)
@@ -510,11 +689,10 @@ theme.Maze_CreateMapchip_Item = function(_xi, _yi, _char)
     return obj
 end
 
-theme.Maze_CreateMapchip_Prowler = function(_xi, _yi, _char)
-    local no = tonumber(_char)
-    if no == nil then return nil end
+theme._Maze_CreateMapchip_Prowler = function(_xi, _yi, _char)
+    if cs.maze:IsProwler(_char) == false then return nil end
 
-    local obj = cs.sprite:CreateObject(theme.GenerateObjectName("Prowler", _xi, _yi), "Prowler_Enemy")
+    local obj = cs.sprite:CreateObject(theme._GenerateObjectName("Prowler", _xi, _yi), "Prowler_Enemy")
     if obj == nil then return nil end
 
     obj:SetTransparency(C_TransparencyValue)
@@ -524,7 +702,7 @@ end
 
 -- Walker -----------------------------------------------------------
 
-theme.Maze_GenWalker = function()
+theme._Maze_GenWalker = function()
     local obj = cs.sprite:CreateObject("Walker", "Walker")
     if obj == nil then return false end
 
@@ -538,19 +716,16 @@ end
 
 -- etc --------------------------------------------------------------
 
-theme.GenerateObjectName = function(_name, _xi, _yi)
+theme._GenerateObjectName = function(_name, _xi, _yi)
     return _name .. string.format("_%03d%03d", _xi, _yi)
 end
 
-theme.ConvertToLocalLoc = function(_wloc)
-    local x, y = _wloc.x - cs.walker.x, _wloc.y - cs.walker.y
+theme._ConvCoord_Walkermap2Mazemap = function(_wm)
+    local dx = { _wm.x, _wm.y, -_wm.x, -_wm.y }
+    local dy = { -_wm.y, _wm.x, _wm.y, -_wm.x }
 
-    local d = {
-        { x = x, y = y },
-        { x = y, y = -x },
-        { x = -x, y = -y },
-        { x = -y, y = x }
+    return {
+        x = cs.walker.x + dx[cs.walker.d + 1],
+        y = cs.walker.y + dy[cs.walker.d + 1]
     }
-
-    return d[cs.walker.d + 1]
 end

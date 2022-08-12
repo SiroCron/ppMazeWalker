@@ -32,6 +32,16 @@ m.sorted_keys = function(_t)
     return keys
 end
 
+-- 配列型のみ
+m.concat = function(_a1, _a2)
+    local cca = {}
+
+    for _, v in ipairs(_a1) do table.insert(cca, v) end
+    for _, v in ipairs(_a2) do table.insert(cca, v) end
+
+    return cca
+end
+
 -- ////////////////////////////////////////////////////////////////////////////
 -- ///
 -- //

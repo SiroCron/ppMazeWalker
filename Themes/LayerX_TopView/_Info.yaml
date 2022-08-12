@@ -8,5 +8,6 @@ rules:
   # - {name: "Layer1", version: [1,0]} # 1.0.x系で利用可能
   # - {name: "Layer1", version: [1,1]} # 1.1.x系で利用可能, 同一ルールで複数対応する場合はそれぞれ書く
   #
-  - {name: "Layer0", version: [1,0]}
-  - {name: "Layer1", version: [1,0]}
+  - {name: "Layer0", version: [1,1]}
+  - {name: "Layer1", version: [1,1]}
+  - {name: "Layer2", version: [1,1]}
