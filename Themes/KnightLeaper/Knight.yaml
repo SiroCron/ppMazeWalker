@@ -1,0 +1,12 @@
+name: "Knight"
+
+images:
+  - {name: "img", file: "Knight.png", width: 32, height: 32}
+
+animations:
+  - {name: "anim", img_name: "img", interval: 200, pattern: "0121<"}
+
+states: ["anim"]
+
+detail:
+  scale: {x: 0.5, y: 0.5, z: 0.5}

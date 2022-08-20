@@ -1,0 +1,9 @@
+name: "Boundary"
+
+images:
+  - {name: "img", file: "Boundary.png", width: 16, height: 16}
+
+animations:
+  - {name: "anim", img_name: "img", pattern: "0"}
+
+states: ["anim"]

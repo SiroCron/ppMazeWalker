@@ -1,0 +1,9 @@
+name: "Circle"
+
+images:
+  - {name: "img", file: "Circle.png", width: 16, height: 16}
+
+animations:
+  - {name: "anim", img_name: "img", interval: 200, pattern: "0121<"}
+
+states: ["anim"]

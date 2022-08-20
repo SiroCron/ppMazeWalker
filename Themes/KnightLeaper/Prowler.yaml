@@ -1,0 +1,16 @@
+name: "Prowler"
+
+images:
+  - {name: "img", file: "Prowler.png", width: 32, height: 32}
+
+animations:
+  - {name: "s0", img_name: "img", interval: 200, pattern: "0121<"}
+  - {name: "s1", img_name: "img", interval: 200, pattern: "3454<"}
+  - {name: "s2", img_name: "img", interval: 200, pattern: "6787<"}
+  - {name: "s3", img_name: "img", interval: 200, pattern: "9ABA<"}
+  - {name: "s4", img_name: "img", interval: 200, pattern: "CDED<"}
+
+states: ["s0", "s1", "s2", "s3", "s4"]
+
+detail:
+  scale: {x: 0.5, y: 0.5, z: 0.5}

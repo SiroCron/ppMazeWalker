@@ -1,0 +1,3 @@
+# 対応しているルール
+rules:
+  - {name: "KnightLeaper", version: [1]}

@@ -1,0 +1,13 @@
+name: "Burn"
+
+images:
+  - {name: "img", file: "Burn.png", width: 32, height: 32}
+
+animations:
+  - {name: "anim", img_name: "img", interval: 60, pattern: "012345678"}
+
+states: ["anim"]
+
+detail:
+  pivot: {x: 0.5, y: 0.25}
+  scale: {x: 2.0, y: 2.0, z: 2.0}

@@ -1,0 +1,12 @@
+name: "Food"
+
+images:
+  - {name: "img", file: "Food.png", width: 16, height: 16}
+
+animations:
+  - {name: "s0", img_name: "img", pattern: "0"}
+  - {name: "s1", img_name: "img", pattern: "1"}
+  - {name: "s2", img_name: "img", pattern: "2"}
+  - {name: "s3", img_name: "img", pattern: "3"}
+
+states: ["s0", "s1", "s2", "s3"]

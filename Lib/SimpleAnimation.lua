@@ -47,6 +47,17 @@ m.Exec = function(_co_name, _si)
 end
 
 -- ============================================================================
+-- Cameraの移動
+--
+m.MoveCameraStart = function(_co_name, _dx, _dy, _dz, _sec)
+    m.co_table[_co_name] = m.GenMoveCameraCoroutine()
+
+    local co_state, ret_code = coroutine.resume(m.co_table[_co_name], _dx, _dy, _dz, _sec)
+
+    return co_state and ret_code -- 必ず true, true
+end
+
+-- ============================================================================
 -- SpriteObjectの移動
 --
 m.MoveSpriteStart = function(_co_name, _sprite_obj, _camera_sync, _dx, _dy, _dz, _sec)
@@ -78,6 +89,27 @@ end
 --                                                                           //
 --                                                                          ///
 -- ////////////////////////////////////////////////////////////////////////////
+
+m.GenMoveCameraCoroutine = function()
+    return coroutine.create(function(_dx, _dy, _dz, _sec)
+        local cam_pos = cs.camera:GetPosition()
+        local past_sec = 0.0
+
+        coroutine.yield(true) -- Init時
+
+        while past_sec < _sec do
+            local si = coroutine.yield(true) -- 初回は何もすることなく終わる
+            past_sec = past_sec + si.delta_time
+            if _sec < past_sec then past_sec = _sec end
+
+            local perc = past_sec / _sec
+            local mx, my, mz = _dx * perc, _dy * perc, _dz * perc
+            cs.camera:SetPosition(cam_pos.x + mx, cam_pos.y + my, cam_pos.z + mz)
+        end
+
+        return false -- 終了
+    end)
+end
 
 m.GenMoveSpriteCoroutine = function()
     return coroutine.create(function(_sprite_obj, _camera_sync, _dx, _dy, _dz, _sec)

@@ -1,0 +1,10 @@
+name: "Obstacle"
+
+images:
+  - {name: "img", file: "Obstacle.png", width: 16, height: 16}
+
+animations:
+  - {name: "s0", img_name: "img", pattern: "0"}
+  - {name: "s1", img_name: "img", pattern: "1"}
+
+states: ["s0", "s1"]

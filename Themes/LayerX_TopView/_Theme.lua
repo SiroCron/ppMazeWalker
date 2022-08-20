@@ -527,6 +527,7 @@ end
 -- ////////////////////////////////////////////////////////////////////////////
 
 theme._InitCamera = function()
+    cs.camera:SetShaderParam(true, 1.0, 2)
     cs.camera:SetBackgroundColor(0.1, 0.1, 0.2, 1.0)
     cs.camera:SetOrthographic()
     cs.camera:SetPosition(0, 0, C_CameraZ)

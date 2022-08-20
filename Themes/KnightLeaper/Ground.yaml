@@ -1,0 +1,9 @@
+name: "Ground"
+
+images:
+  - {name: "img", file: "Ground.png", width: 16, height: 16}
+
+animations:
+  - {name: "anim", img_name: "img", pattern: "0"}
+
+states: ["anim"]
